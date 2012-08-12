@@ -1,0 +1,26 @@
+{
+  "author": "Andrew Baxter <andy@highfellow.org> (http://highfellow.org)",
+  "name": "twelve-days",
+  "description": "A demo of webL10n and dynamictemplate",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/highfellow/twelve-days.git"
+  },
+  "engines": {
+    "node": "~0.6.10"
+  },
+  "dependencies": {
+    "browserify": "~1.13.5",
+    "dynamictemplate": "~0.5.6",
+    "dt-jquery": "~0.3.3",
+    "coffee-script": "~1.2.0"
+  },
+  "keywords": ["christmas","song","demo","webL10n","dynamictemplate","translation","localisation"],
+  "scripts": {
+    "postinstall": "./configure.sh; ./build.sh"
+  },
+  "devDependencies": {
+  },
+  "optionalDependencies": {}
+}
