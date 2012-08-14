@@ -1,5 +1,5 @@
 #
-# app to display current time in words in various languages.
+# app to display 'The Twelve Days of Christmas' in different languages.
 #
 url = require 'url'
 webL10n = require './lib/webL10n/l10n.js'
@@ -119,3 +119,4 @@ docURL=document.URL
 urlData=url.parse(docURL)
 pathbits=urlData.pathname.split "/"
 docPath=pathbits[0...pathbits.length-1].join "/"
+loadLocale window.navigator.language
