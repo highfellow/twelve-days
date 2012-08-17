@@ -14,7 +14,8 @@
     "browserify": "~1.13.5",
     "dynamictemplate": "~0.5.6",
     "dt-jquery": "~0.3.3",
-    "coffee-script": "~1.2.0"
+    "coffee-script": "~1.2.0",
+    "dt-localise": "git@github.com:highfellow/dt-localise.git"
   },
   "keywords": ["christmas","song","demo","webL10n","dynamictemplate","translation","localisation"],
   "scripts": {

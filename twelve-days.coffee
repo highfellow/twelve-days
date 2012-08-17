@@ -2,8 +2,8 @@
 # app to display 'The Twelve Days of Christmas' in different languages.
 #
 url = require 'url'
-webL10n = require './lib/webL10n/l10n.js'
 { Template, jqueryify } = window.dynamictemplate
+{ localise, setLocaleCallback, loadLocale, _ } = require 'dt-localise'
 
 # globals
 
@@ -22,15 +22,15 @@ class Page
     @tpl ?= null
     @page ?= null
     @content = null
+    @heading = null
     @contentElts = []
     @selectElt ?= null
     # declare and instantiate the template
     console.log "initialising template"
     that = this
-    @tpl = jqueryify new Template schema:'html5', ->
+    @tpl = jqueryify localise new Template schema:'html5', ->
       that.page = @$div class:'page', ->
-        @$div class:'heading', ->
-          @$h1 class:'heading', 'data-l10n-id':"heading", 'The Twelve Days of Christmas'
+        that.heading = @$div class:'heading'
         @$div class:'contentHolder', ->
           that.content = @$div()
           that.content.ready ->
@@ -48,8 +48,8 @@ class Page
       for el in @tpl.jquery
         $('body').append el
 
-  addContentElt: (func) ->
-    elt=func.bind(@content)()
+  addContentElt: (parent, func) ->
+    elt=func.bind(parent)()
     console.log "Adding element:", elt
     @contentElts.push elt
 
@@ -65,25 +65,24 @@ class Page
     console.log "page.fillContent", @content
     for elt in @contentElts
       elt.remove()
-    @addContentElt ->
+    @addContentElt @heading, ->
+      @$h1 {class:'heading', 'data-dt-l10n-id':"heading"}, 'The Twelve Days of Christmas'
+    @addContentElt @content, ->
       @$div ->
         for day in [1..12]
           ord = _("days-#{day}")
           console.log day, ord
-          @$p _('onthe', {day: ord})
-          @$p _('mytrue')
+          # the text for the first para needs to be set manually, not using dt-localise, because its translation needs a parameter (day)
+          @$p _('onthe', {day:ord})
+          @$p {'data-dt-l10n-id': 'mytrue'}, '-'
           for present in [day..1]
             if day is 1 and present is 1
-              @$p _("presents-1-first")
+              @$p {'data-dt-l10n-id': 'presents-1-first'}, '-'
             else
-              @$p _("presents-#{present}")
+              @$p {'data-dt-l10n-id': "presents-#{present}"}, '-'
           @$p class:'break'
 
 window.page = page = new Page()
-
-loadLocale = (locale) ->
-  document.webL10n.setLanguage(locale)
-  console.log "Locale loading..."
 
 waitOn = (test, callback)->
   # wait until test returns true before invoking callback
@@ -96,23 +95,11 @@ waitOn = (test, callback)->
       waitOn test, callback
     , 5
 
-window.addEventListener 'localized', ->
-  @firstRun ?= yes
-  newLang = document.documentElement.lang = document.webL10n.getLanguage()
-  document.documentElement.dir = document.webL10n.getDirection()
-  console.log "Localised", newLang
-  if @firstRun
-    loadLocale 'en'
-    @firstRun = no
-  else
-      # TODO - a bit kludgy!
-      waitOn ->
-        page.content.isready
-      , ->
-        page.fillContent()
-, false
-
-_ = document.webL10n.get
+setLocaleCallback ->
+  # only call this the second time (because webL10n tries to localise on loading the page when the template isn't ready).
+  if @called
+    page.fillContent()
+  @called ?= yes
 
 console.log "starting up"
 docURL=document.URL
